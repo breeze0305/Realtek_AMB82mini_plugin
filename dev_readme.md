@@ -2,7 +2,7 @@
 
 這份文件是未來理解與修改本專案的主要入口。讀完後應該能知道：這個程式有哪些功能、前後端怎麼分工、常見功能要改哪裡、版本號如何由 `version.txt` 統一管理，以及 commit / push 的工作習慣。
 
-目前軟體版本：`3.17.1`
+目前軟體版本：`3.17.2`
 
 > 注意：`dev_readme.md` 目前會納入 git 追蹤。若交接內容或維護流程有變更，應和相關程式碼一起 commit。
 
@@ -20,7 +20,7 @@
 - UI icon：`lucide-react`
 - Windows bundle：Tauri NSIS
 
-## Current frontend architecture (3.17.1)
+## Current frontend architecture (3.17.2)
 
 This section is the authoritative source map for the current frontend. Some older notes below may still mention the pre-refactor shape where most UI lived in `src/App.tsx`; when in doubt, follow this section.
 
@@ -518,7 +518,7 @@ UI 原則：
 
 ## 版本號更新清單
 
-目前版本是 `3.17.1`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
+目前版本是 `3.17.2`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
 
 `npm run sync-version` 會把 `version.txt` 同步到：
 

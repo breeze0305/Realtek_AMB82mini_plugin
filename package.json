@@ -1,7 +1,7 @@
 {
   "name": "amb82-mini-computer-plugin",
   "private": true,
-  "version": "3.17.1",
+  "version": "3.17.2",
   "type": "module",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
