@@ -1,4 +1,8 @@
 import boxClassList from "./assets/resource-guides/box/box-class-list.png";
+import classificationClassList from "./assets/resource-guides/classification/classification-class-list.png";
+import classificationClassListTab from "./assets/resource-guides/classification/classification-class-list-tab.png";
+import classificationModelSelection from "./assets/resource-guides/classification/model-selection.png";
+import classificationWeightLocation from "./assets/resource-guides/classification/weight-folder-location.png";
 import carWiringDiagram from "./assets/resource-guides/gesture/car-wiring-diagram.png";
 import gestureClassList from "./assets/resource-guides/gesture/gesture-class-list.png";
 import gestureModelSelection from "./assets/resource-guides/gesture/model-selection.png";
@@ -114,6 +118,65 @@ function createTrackingSections(variant: "Hand" | "Box", classListImage: string)
   ];
 }
 
+// Classification weights differ in training content, but use the same setup and class names.
+const classificationSections: ResourceGuideDefinition["sections"] = [
+  {
+    titleKey: "resourceHandCodeTitle",
+    bodyKey: "resourceClassificationCodeGuide",
+    codeExamples: [
+      {
+        labelKey: "resourceGuideBeforeCode",
+        code: "imgclass.modelSelect(IMAGE_CLASSIFICATION, NA_MODEL, NA_MODEL, NA_MODEL, NA_MODEL, DEFAULT_IMGCLASS);",
+      },
+      {
+        labelKey: "resourceGuideAfterCode",
+        code: "imgclass.modelSelect(IMAGE_CLASSIFICATION, NA_MODEL, NA_MODEL, NA_MODEL, NA_MODEL, CUSTOMIZED_IMGCLASS);",
+      },
+    ],
+    image: {
+      src: classificationModelSelection,
+      altKey: "resourceClassificationModelImageAlt",
+      captionKey: "resourceClassificationModelImageCaption",
+    },
+  },
+  {
+    titleKey: "resourceHandClassTabTitle",
+    bodyKey: "resourceClassificationClassTabBody",
+    image: {
+      src: classificationClassListTab,
+      altKey: "resourceClassificationTabImageAlt",
+      captionKey: "resourceClassificationTabImageCaption",
+    },
+  },
+  {
+    titleKey: "resourceClassificationClassesTitle",
+    bodyKey: "resourceClassificationClassesBody",
+    image: {
+      src: classificationClassList,
+      altKey: "resourceClassificationClassesImageAlt",
+      captionKey: "resourceClassificationClassesImageCaption",
+    },
+  },
+  {
+    titleKey: "resourceHandOpenFolderTitle",
+    bodyKey: "resourceHandOpenFolderBody",
+    image: {
+      src: gestureOpenFolder,
+      altKey: "resourceHandOpenFolderImageAlt",
+      captionKey: "resourceHandOpenFolderImageCaption",
+    },
+  },
+  {
+    titleKey: "resourceClassificationWeightLocationTitle",
+    bodyKey: "resourceClassificationWeightLocationBody",
+    image: {
+      src: classificationWeightLocation,
+      altKey: "resourceClassificationWeightLocationImageAlt",
+      captionKey: "resourceClassificationWeightLocationImageCaption",
+    },
+  },
+];
+
 // Each resource owns its content keys and placeholder status.
 // Set isPlaceholder to false when replacing a resource's placeholder guide.
 const resourceGuides: Record<string, ResourceGuideDefinition> = {
@@ -130,40 +193,22 @@ const resourceGuides: Record<string, ResourceGuideDefinition> = {
     sections: createTrackingSections("Box", boxClassList),
   },
   "resource-japan": {
+    isPlaceholder: false,
     nameKey: "japanModel",
     summaryKey: "resourceJapanGuideSummary",
-    sections: [
-      { titleKey: "resourceExampleGuideTitle", bodyKey: "resourceJapanCodeGuide" },
-      {
-        titleKey: "resourceWeightGuideTitle",
-        bodyKey: "resourceJapanWeightGuide",
-        image: { altKey: "resourceWeightImageAlt", captionKey: "resourceWeightImageCaption" },
-      },
-    ],
+    sections: classificationSections,
   },
   "resource-taiwan": {
+    isPlaceholder: false,
     nameKey: "taiwanModel",
     summaryKey: "resourceTaiwanGuideSummary",
-    sections: [
-      { titleKey: "resourceExampleGuideTitle", bodyKey: "resourceTaiwanCodeGuide" },
-      {
-        titleKey: "resourceWeightGuideTitle",
-        bodyKey: "resourceTaiwanWeightGuide",
-        image: { altKey: "resourceWeightImageAlt", captionKey: "resourceWeightImageCaption" },
-      },
-    ],
+    sections: classificationSections,
   },
   "resource-singapore": {
+    isPlaceholder: false,
     nameKey: "singaporeModel",
     summaryKey: "resourceSingaporeGuideSummary",
-    sections: [
-      { titleKey: "resourceExampleGuideTitle", bodyKey: "resourceSingaporeCodeGuide" },
-      {
-        titleKey: "resourceWeightGuideTitle",
-        bodyKey: "resourceSingaporeWeightGuide",
-        image: { altKey: "resourceWeightImageAlt", captionKey: "resourceWeightImageCaption" },
-      },
-    ],
+    sections: classificationSections,
   },
 };
 

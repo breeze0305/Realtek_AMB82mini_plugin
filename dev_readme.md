@@ -37,7 +37,7 @@ This section is the authoritative source map for the current frontend. Some olde
 - `src/homeCards.ts`
   - Home and resource-library card composition. Resource definitions have an explicit installer/weight category so new files can be added without changing page JSX.
 - `src/resourceGuides.ts`
-  - `getResourceGuide(resourceId, t)` supplies each code/model-weight resource's guide sections, text, code examples, images, captions, links, and placeholder status. The gesture (01) and AMB box (02) guides each contain eight sections, six bundled images (five screenshots and one wiring diagram), and an assembly video link that opens in the default browser. They share the general instructions and five images, while each uses its own class settings screenshot: gesture has `itemList[5]` with IDs 0–4 named `gesture1`–`gesture5`; box has `itemList[1]` with ID 0 named `box`, all enabled with value 1. Robot car instructions use `hand_code.txt` for gesture and `code.txt` for box. The other three guides remain explicitly marked placeholders. Localized copy lives in `src/i18n.ts`.
+  - `getResourceGuide(resourceId, t)` supplies each code/model-weight resource's guide sections, text, code examples, images, captions, links, and placeholder status. All five resources have complete guides. The gesture (01) and AMB box (02) guides each contain eight sections, six bundled images (five screenshots and one wiring diagram), and an assembly video link that opens in the default browser. They share the general instructions and five images, while each uses its own class settings screenshot: gesture has `itemList[5]` with IDs 0–4 named `gesture1`–`gesture5`; box has `itemList[1]` with ID 0 named `box`, all enabled with value 1. Robot car instructions use `hand_code.txt` for gesture and `code.txt` for box. Classification guides (03–05) share five operating sections and five images for `RTSPImageClassification`, `CUSTOMIZED_IMGCLASS`, `ClassificationClassList.h`, class IDs 0–2 named `box`/`money`/`mouse` in `imgclassItemList`, and placement of `img_class_cnn.nb`. Only their summaries differ: `money` means Japanese coins, Taiwanese banknotes, or Singaporean banknotes; `box` and `mouse` always mean an AMB box and a computer mouse. Unknown resource IDs still receive placeholder content. Localized copy lives in `src/i18n.ts`.
 - `src/components/`
   - `AppHeader.tsx`: app title, back button, language menu, settings entry.
   - `CardGrid.tsx`: shared numbered card grid, download progress, running state, and split-action rendering.
@@ -181,7 +181,9 @@ Image conversion behavior:
 
 「程式碼與權重」二級頁左側單欄列出原有五張資源卡，右側顯示所選資源的文字、圖片與圖片說明，進入時預設第一項。左右欄依內容自然伸展，共用 `appShell` 的單一整頁垂直捲動條；卡片增多或說明變長時，兩欄一起捲動，不各自捲動。點擊卡片或透過鍵盤操作只切換說明；卡片內的「取得」按鈕維持原本的另存流程，不因選取說明而觸發。
 
-01 手勢與 02 AMB 盒子卡皆提供八個段落的正式教學，每項顯示六張圖片（五張操作截圖與一張自走車接線圖）。共同步驟包含在 `ObjectDetectionLoop` 將 `DEFAULT_YOLOV4TINY` 改為 `CUSTOMIZED_YOLOV7TINY`，再切換至 `ObjectClassList.h`。01 的 `itemList[5]` 使用類別 ID 0～4、名稱 `gesture1`～`gesture5`；02 的 `itemList[1]` 僅使用類別 ID 0、名稱 `box`，各項啟用值皆為 1，類別設定截圖分別對應各項資源。設定類別後，透過主選單的「開啟AmebaPro2資料夾」進入 `libraries → NeuralNetwork → examples → ObjectDetectionLoop`，將取得的 `yolov7_tiny.nb` 放在與 `ObjectDetectionLoop.ino`、`ObjectClassList.h` 相同的資料夾。自走車用途以 01 的 `hand_code.txt` 或 02 的 `code.txt` 完整取代 `ObjectDetectionLoop.ino`，最後依序附上共用的自走車接線圖與組裝影片。影片 URL 為 `https://www.youtube.com/watch?v=UpYyOiEFA0k`，經既有 `open_url` 命令由預設瀏覽器開啟，觀看影片需要網路連線；其餘三項仍使用明確標示的佔位說明。「安裝檔」頁維持原卡片排列與下載／安裝功能。
+01 手勢與 02 AMB 盒子卡皆提供八個段落的正式教學，每項顯示六張圖片（五張操作截圖與一張自走車接線圖）。共同步驟包含在 `ObjectDetectionLoop` 將 `DEFAULT_YOLOV4TINY` 改為 `CUSTOMIZED_YOLOV7TINY`，再切換至 `ObjectClassList.h`。01 的 `itemList[5]` 使用類別 ID 0～4、名稱 `gesture1`～`gesture5`；02 的 `itemList[1]` 僅使用類別 ID 0、名稱 `box`，各項啟用值皆為 1，類別設定截圖分別對應各項資源。設定類別後，透過主選單的「開啟AmebaPro2資料夾」進入 `libraries → NeuralNetwork → examples → ObjectDetectionLoop`，將取得的 `yolov7_tiny.nb` 放在與 `ObjectDetectionLoop.ino`、`ObjectClassList.h` 相同的資料夾。自走車用途以 01 的 `hand_code.txt` 或 02 的 `code.txt` 完整取代 `ObjectDetectionLoop.ino`，最後依序附上共用的自走車接線圖與組裝影片。影片 URL 為 `https://www.youtube.com/watch?v=UpYyOiEFA0k`，經既有 `open_url` 命令由預設瀏覽器開啟，觀看影片需要網路連線。
+
+03 日本、04 台灣與 05 新加坡影像分類卡皆提供五個段落的正式教學，每項顯示相同的五張操作截圖。操作順序為在 Arduino IDE 開啟 `File → AmebaNN → RTSPImageClassification`，將約第 90 行 `imgclass.modelSelect` 的 `DEFAULT_IMGCLASS` 改為 `CUSTOMIZED_IMGCLASS`；切換至 `ClassificationClassList.h`；將 `imgclassItemList` 的類別 ID 0、1、2 分別設為 `box`、`money`、`mouse`，啟用值皆為 1；透過本工具開啟 AmebaPro2 資料夾；進入 `libraries → NeuralNetwork → examples → RTSPImageClassification`，將所選的 `img_class_cnn.nb` 放在與 `RTSPImageClassification.ino`、`ClassificationClassList.h` 相同的資料夾。三項資源只在摘要說明訓練內容差異：`box` 均為 AMB 盒子，`mouse` 均為滑鼠，`money` 則依 03／04／05 分別為日本硬幣／台灣紙鈔／新加坡紙鈔。其餘操作與圖片共用，避免後續維護時出現不一致。「安裝檔」頁維持原卡片排列與下載／安裝功能。
 
 設定入口不是主選單卡片。設定按鈕位於右上角語言選單旁邊。
 
@@ -395,8 +397,10 @@ Reset：
 ### 修改程式碼與權重說明
 
 - 在 `src/resourceGuides.ts` 的 `getResourceGuide(resourceId, t)` 維護各資源的段落、程式碼修改前後範例、圖片與佔位狀態，並補上替代文字與圖片說明。
-- 手勢教學圖片放在 `src/assets/resource-guides/gesture/`：五張操作截圖為 `model-selection.png`、`object-class-list-tab.png`、`gesture-class-list.png`、`open-amebapro2-folder.png`、`weight-folder-location.png`，自走車接線圖為 `car-wiring-diagram.png`。盒子教學的第三張圖片使用 `src/assets/resource-guides/box/box-class-list.png`，其餘五張共用手勢教學的圖片。共七個圖片檔案透過 Vite import 隨前端打包進 exe，每項教學顯示六張，可離線顯示，不依賴使用者原本的 Screenshots 或 Downloads 目錄。組裝影片保留為 YouTube 外部連結，由預設瀏覽器開啟，需網路連線。
-- 使用者提供其餘資源的正式教學後，替換對應佔位內容與標記，並同步更新 `src/i18n.ts` 的繁中／英文／日文文字。
+- 手勢教學圖片放在 `src/assets/resource-guides/gesture/`：五張操作截圖為 `model-selection.png`、`object-class-list-tab.png`、`gesture-class-list.png`、`open-amebapro2-folder.png`、`weight-folder-location.png`，自走車接線圖為 `car-wiring-diagram.png`。盒子教學的第三張圖片使用 `src/assets/resource-guides/box/box-class-list.png`，其餘五張共用手勢教學的圖片。01 與 02 各顯示六張圖片。組裝影片保留為 YouTube 外部連結，由預設瀏覽器開啟，需網路連線。
+- 03～05 共用 `src/assets/resource-guides/classification/` 的四張圖片：`model-selection.png`、`classification-class-list-tab.png`、`classification-class-list.png`、`weight-folder-location.png`；開啟 AmebaPro2 資料夾的步驟共用 `gesture/open-amebapro2-folder.png`，因此每項影像分類教學顯示五張。所有教學共十一個圖片檔案，皆透過 Vite import 隨前端打包進 exe，可離線顯示，不依賴使用者原本的 Screenshots 或 Downloads 目錄。
+- 03～05 的操作段落與圖片維持共用，只在各資源摘要中描述訓練內容差異。類別設定的實際變數名稱是 `imgclassItemList`，截圖宣告為 `imgclassItemList[6]`，文字說明只要求將 ID 0～2 設為 `box`／`money`／`mouse` 並啟用，不要求修改陣列大小。
+- 目前五項資源皆有正式教學。未定義的資源 ID 仍保留佔位備援；新增資源時應補上正式內容與標記，並同步更新 `src/i18n.ts` 的繁中／英文／日文文字。
 - 顯示與選取操作集中在 `src/components/ResourceLibraryView.tsx`；修改時維持卡片選取與「取得」按鈕各自的操作效果。
 
 ### 新增網路下載資源
@@ -627,7 +631,7 @@ npm.cmd run tauri build
 6. 設定頁切換 `YUY2`、`NV12`、`MJPG`、`H264`、`H265` 後，`settings.json` 有保存。
 7. 設定頁切換格式後，`UVCD_pram.h` 被覆寫為選定格式 `1`、其他格式 `0`。
 8. 設定頁按下「清除權重紀錄」時，只刪除兩個固定路徑的權重；檔案不存在視為已清除，且相鄰或其他目錄中的 `.nb` 檔案保持不變。
-9. 「程式碼與權重」頁在一般大小與 `1120 × 640` 下維持左側單欄資源卡、右側說明，預設顯示第一項；增加左側卡片或加長右側說明後，確認兩欄依內容自然伸展，僅由 `appShell` 顯示單一整頁垂直捲動條，在任一欄捲動時兩欄都一起移動。依序點擊五張卡片與使用鍵盤選取，都會切換對應說明，且不開啟另存視窗；01 與 02 應各顯示八段正式教學、程式碼修改前後範例、權重放置路徑與六張可離線查看的圖片（五張操作截圖與一張接線圖）。01 類別設定須為 `itemList[5]`、`gesture1`～`gesture5`，02 須為 `itemList[1]`、ID 0 的單一 `box`，且使用各自的類別設定截圖；自走車替換程式碼檔名分別為 `hand_code.txt` 與 `code.txt`。替換說明後依序顯示接線圖與組裝影片，影片連結須由預設瀏覽器開啟指定 YouTube 網址；其餘三項保留佔位說明。按各卡片「取得」時，原本的檔案另存功能仍正常；切換語言後所選說明也同步更新。安裝檔頁維持原有排列與操作。
+9. 「程式碼與權重」頁在一般大小與 `1120 × 640` 下維持左側單欄資源卡、右側說明，預設顯示第一項；增加左側卡片或加長右側說明後，確認兩欄依內容自然伸展，僅由 `appShell` 顯示單一整頁垂直捲動條，在任一欄捲動時兩欄都一起移動。依序點擊五張卡片與使用鍵盤選取，都會切換對應正式說明，且不開啟另存視窗；01 與 02 應各顯示八段教學、程式碼修改前後範例、權重放置路徑與六張可離線查看的圖片（五張操作截圖與一張接線圖）。01 類別設定須為 `itemList[5]`、`gesture1`～`gesture5`，02 須為 `itemList[1]`、ID 0 的單一 `box`，且使用各自的類別設定截圖；自走車替換程式碼檔名分別為 `hand_code.txt` 與 `code.txt`。替換說明後依序顯示接線圖與組裝影片，影片連結須由預設瀏覽器開啟指定 YouTube 網址。03～05 應各顯示五段相同操作與五張相同圖片，包括 `RTSPImageClassification`、`CUSTOMIZED_IMGCLASS`、`ClassificationClassList.h`、`imgclassItemList` 的 `box`／`money`／`mouse` 類別設定及 `img_class_cnn.nb` 放置位置；三項摘要須分別說明日本硬幣、台灣紙鈔、新加坡紙鈔，且不顯示自走車段落或影片。按各卡片「取得」時，原本的檔案另存功能仍正常；切換語言後所選說明也同步更新。安裝檔頁維持原有排列與操作。
 10. 無外網且沒有快取時，Arduino / VLC 會清楚回報無法取得；內嵌資源仍可取得。
 11. 有外網時首次取得 Arduino / VLC 會顯示下載進度，完成後可正常另存或自動安裝。
 12. 中斷外網後再次取得或安裝同一版本，會通過 SHA-256 驗證並重用快取，不重新下載。

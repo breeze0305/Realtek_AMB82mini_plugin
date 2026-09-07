@@ -74,15 +74,32 @@ export const translations = {
     resourceBoxWeightLocationTitle: "放置盒子權重檔案",
     resourceBoxCarBody:
       "以上為一般 AMB 盒子權重的範例設定流程。如需使用自走車，請按「取得」儲存 code.txt，複製其中的全部程式碼，再完整取代 ObjectDetectionLoop.ino 的內容；請勿附加在原程式碼後方。",
-    resourceJapanGuideSummary: "AMB 盒子、日本硬幣與滑鼠分類權重的說明預留區。",
-    resourceJapanCodeGuide: "日本硬幣分類範例的程式設定步驟待補。",
-    resourceJapanWeightGuide: "日本硬幣分類權重的放置路徑與操作步驟待補。",
-    resourceTaiwanGuideSummary: "AMB 盒子、台灣紙鈔與滑鼠分類權重的說明預留區。",
-    resourceTaiwanCodeGuide: "台灣紙鈔分類範例的程式設定步驟待補。",
-    resourceTaiwanWeightGuide: "台灣紙鈔分類權重的放置路徑與操作步驟待補。",
-    resourceSingaporeGuideSummary: "AMB 盒子、新加坡紙鈔與滑鼠分類權重的說明預留區。",
-    resourceSingaporeCodeGuide: "新加坡紙鈔分類範例的程式設定步驟待補。",
-    resourceSingaporeWeightGuide: "新加坡紙鈔分類權重的放置路徑與操作步驟待補。",
+    resourceJapanGuideSummary:
+      "本權重的分類名稱為 box（AMB 盒子）、money（日本硬幣）、mouse（滑鼠）。03～05 的設定與權重放置步驟相同，僅權重的訓練內容不同。",
+    resourceTaiwanGuideSummary:
+      "本權重的分類名稱為 box（AMB 盒子）、money（台灣紙鈔）、mouse（滑鼠）。03～05 的設定與權重放置步驟相同，僅權重的訓練內容不同。",
+    resourceSingaporeGuideSummary:
+      "本權重的分類名稱為 box（AMB 盒子）、money（新加坡紙鈔）、mouse（滑鼠）。03～05 的設定與權重放置步驟相同，僅權重的訓練內容不同。",
+    resourceClassificationCodeGuide:
+      "在 Arduino IDE 中開啟 File → AmebaNN → RTSPImageClassification，找到約第 90 行的 imgclass.modelSelect，將 DEFAULT_IMGCLASS 改為 CUSTOMIZED_IMGCLASS。實際行號可能因版本而不同。",
+    resourceClassificationModelImageAlt: "RTSPImageClassification 中將模型設定改為 CUSTOMIZED_IMGCLASS 的範例畫面",
+    resourceClassificationModelImageCaption: "模型設定修改範例：將 DEFAULT_IMGCLASS 替換為 CUSTOMIZED_IMGCLASS。",
+    resourceClassificationClassTabBody: "在 Arduino IDE 上方的分頁列，切換到 ClassificationClassList.h。",
+    resourceClassificationTabImageAlt: "Arduino IDE 中的 ClassificationClassList.h 分頁位置",
+    resourceClassificationTabImageCaption: "點選 ClassificationClassList.h 分頁，編輯影像分類的類別名稱。",
+    resourceClassificationClassesTitle: "設定三種影像分類類別",
+    resourceClassificationClassesBody:
+      "在 imgclassItemList 陣列中，將類別 ID 0、1、2 的名稱依序設為 box、money、mouse，並將這三個項目的啟用值設為 1，如下圖所示。",
+    resourceClassificationClassesImageAlt:
+      "imgclassItemList 中的類別 ID 0、1、2 依序設定為 box、money、mouse，啟用值皆為 1",
+    resourceClassificationClassesImageCaption: "三種分類的類別設定：ID 0 為 box、ID 1 為 money、ID 2 為 mouse。",
+    resourceClassificationWeightLocationTitle: "放置影像分類權重檔案",
+    resourceClassificationWeightLocationBody:
+      "在開啟的 AmebaPro2 資料夾中，依序進入 libraries → NeuralNetwork → examples → RTSPImageClassification。將取得的 img_class_cnn.nb 權重檔案放入此資料夾，與 RTSPImageClassification.ino 及 ClassificationClassList.h 放在同一層。",
+    resourceClassificationWeightLocationImageAlt:
+      "AmebaPro2 的 libraries、NeuralNetwork、examples、RTSPImageClassification 資料夾中，img_class_cnn.nb 與 RTSPImageClassification.ino、ClassificationClassList.h 位於同一層",
+    resourceClassificationWeightLocationImageCaption:
+      "將 img_class_cnn.nb 放在 RTSPImageClassification 範例資料夾內，與程式碼檔案放在同一層。",
     driver: "CH340/CH341安裝檔",
     hand: "手勢-自走車追蹤程式碼/權重",
     objectBoxTracking: "AMB盒子-自走車追蹤程式碼/權重",
@@ -258,21 +275,33 @@ export const translations = {
     resourceBoxCarBody:
       "The steps above configure the sample for the AMB box weights. To use a robot car, click Get to save code.txt, copy all of its code, and replace the entire contents of ObjectDetectionLoop.ino. Do not append it to the existing code.",
     resourceJapanGuideSummary:
-      "Reserved for the classification guide for AMB boxes, Japanese coins, and computer mice.",
-    resourceJapanCodeGuide: "Steps for configuring the Japanese coin classification sample will be added here.",
-    resourceJapanWeightGuide:
-      "The destination folder and steps for placing the Japanese coin classification weights will be added here.",
+      "These weights use the class names box (AMB box), money (Japanese coins), and mouse (computer mouse). Resources 03–05 share the same setup and weight placement steps; only the training content differs.",
     resourceTaiwanGuideSummary:
-      "Reserved for the classification guide for AMB boxes, Taiwanese banknotes, and computer mice.",
-    resourceTaiwanCodeGuide: "Steps for configuring the Taiwanese banknote classification sample will be added here.",
-    resourceTaiwanWeightGuide:
-      "The destination folder and steps for placing the Taiwanese banknote classification weights will be added here.",
+      "These weights use the class names box (AMB box), money (Taiwanese banknotes), and mouse (computer mouse). Resources 03–05 share the same setup and weight placement steps; only the training content differs.",
     resourceSingaporeGuideSummary:
-      "Reserved for the classification guide for AMB boxes, Singaporean banknotes, and computer mice.",
-    resourceSingaporeCodeGuide:
-      "Steps for configuring the Singaporean banknote classification sample will be added here.",
-    resourceSingaporeWeightGuide:
-      "The destination folder and steps for placing the Singaporean banknote classification weights will be added here.",
+      "These weights use the class names box (AMB box), money (Singaporean banknotes), and mouse (computer mouse). Resources 03–05 share the same setup and weight placement steps; only the training content differs.",
+    resourceClassificationCodeGuide:
+      "In Arduino IDE, open File → AmebaNN → RTSPImageClassification. Find imgclass.modelSelect near line 90 and replace DEFAULT_IMGCLASS with CUSTOMIZED_IMGCLASS. The line number may vary by version.",
+    resourceClassificationModelImageAlt:
+      "RTSPImageClassification example with the model setting changed to CUSTOMIZED_IMGCLASS",
+    resourceClassificationModelImageCaption: "Replace DEFAULT_IMGCLASS with CUSTOMIZED_IMGCLASS as shown.",
+    resourceClassificationClassTabBody: "Switch to the ClassificationClassList.h tab at the top of Arduino IDE.",
+    resourceClassificationTabImageAlt: "Location of the ClassificationClassList.h tab in Arduino IDE",
+    resourceClassificationTabImageCaption:
+      "Select ClassificationClassList.h to edit the image classification class names.",
+    resourceClassificationClassesTitle: "Configure the three image classification classes",
+    resourceClassificationClassesBody:
+      "In the imgclassItemList array, set the names for class IDs 0, 1, and 2 to box, money, and mouse, respectively. Set the enabled value of these three entries to 1, as shown below.",
+    resourceClassificationClassesImageAlt:
+      "Class IDs 0, 1, and 2 in imgclassItemList mapped to box, money, and mouse, all with an enabled value of 1",
+    resourceClassificationClassesImageCaption: "The three classes: ID 0 is box, ID 1 is money, and ID 2 is mouse.",
+    resourceClassificationWeightLocationTitle: "Place the image classification weight file",
+    resourceClassificationWeightLocationBody:
+      "In the AmebaPro2 folder, open libraries → NeuralNetwork → examples → RTSPImageClassification in order. Place the downloaded img_class_cnn.nb weight file in this folder, alongside RTSPImageClassification.ino and ClassificationClassList.h.",
+    resourceClassificationWeightLocationImageAlt:
+      "The AmebaPro2 libraries, NeuralNetwork, examples, RTSPImageClassification folder with img_class_cnn.nb alongside RTSPImageClassification.ino and ClassificationClassList.h",
+    resourceClassificationWeightLocationImageCaption:
+      "Place img_class_cnn.nb in the RTSPImageClassification sample folder, alongside the code files.",
     driver: "CH340/CH341 Installer",
     hand: "Gesture - Car Tracking Code/Weight",
     objectBoxTracking: "AMB Box Car Tracking Code/Weight",
@@ -453,16 +482,32 @@ export const translations = {
     resourceBoxWeightLocationTitle: "ボックスの重みファイルを配置する",
     resourceBoxCarBody:
       "以上が AMB ボックスの重みを使うためのサンプル設定手順です。ロボットカーを使用する場合は、「取得」で code.txt を保存し、そのコードをすべてコピーして ObjectDetectionLoop.ino の内容全体を置き換えてください。元のコードの末尾には追加しないでください。",
-    resourceJapanGuideSummary: "AMB ボックス、日本の硬貨、マウスを分類する重みファイルの説明用スペースです。",
-    resourceJapanCodeGuide: "日本の硬貨を分類するサンプルコードの設定手順は準備中です。",
-    resourceJapanWeightGuide: "日本の硬貨を分類する重みファイルの配置場所と操作手順は準備中です。",
-    resourceTaiwanGuideSummary: "AMB ボックス、台湾の紙幣、マウスを分類する重みファイルの説明用スペースです。",
-    resourceTaiwanCodeGuide: "台湾の紙幣を分類するサンプルコードの設定手順は準備中です。",
-    resourceTaiwanWeightGuide: "台湾の紙幣を分類する重みファイルの配置場所と操作手順は準備中です。",
+    resourceJapanGuideSummary:
+      "この重みファイルのクラス名は box（AMB ボックス）、money（日本の硬貨）、mouse（コンピューター用マウス）です。03～05 は設定方法と重みファイルの配置手順が共通で、学習内容のみが異なります。",
+    resourceTaiwanGuideSummary:
+      "この重みファイルのクラス名は box（AMB ボックス）、money（台湾の紙幣）、mouse（コンピューター用マウス）です。03～05 は設定方法と重みファイルの配置手順が共通で、学習内容のみが異なります。",
     resourceSingaporeGuideSummary:
-      "AMB ボックス、シンガポールの紙幣、マウスを分類する重みファイルの説明用スペースです。",
-    resourceSingaporeCodeGuide: "シンガポールの紙幣を分類するサンプルコードの設定手順は準備中です。",
-    resourceSingaporeWeightGuide: "シンガポールの紙幣を分類する重みファイルの配置場所と操作手順は準備中です。",
+      "この重みファイルのクラス名は box（AMB ボックス）、money（シンガポールの紙幣）、mouse（コンピューター用マウス）です。03～05 は設定方法と重みファイルの配置手順が共通で、学習内容のみが異なります。",
+    resourceClassificationCodeGuide:
+      "Arduino IDE で File → AmebaNN → RTSPImageClassification を開き、90 行目前後の imgclass.modelSelect を探して、DEFAULT_IMGCLASS を CUSTOMIZED_IMGCLASS に変更してください。行番号はバージョンによって異なる場合があります。",
+    resourceClassificationModelImageAlt: "RTSPImageClassification のモデル設定を CUSTOMIZED_IMGCLASS に変更した画面",
+    resourceClassificationModelImageCaption: "モデル設定例：DEFAULT_IMGCLASS を CUSTOMIZED_IMGCLASS に変更します。",
+    resourceClassificationClassTabBody: "Arduino IDE 上部のタブから ClassificationClassList.h に切り替えてください。",
+    resourceClassificationTabImageAlt: "Arduino IDE の ClassificationClassList.h タブの位置",
+    resourceClassificationTabImageCaption: "ClassificationClassList.h タブを選択して、画像分類のクラス名を編集します。",
+    resourceClassificationClassesTitle: "画像分類の 3 つのクラスを設定する",
+    resourceClassificationClassesBody:
+      "imgclassItemList 配列のクラス ID 0、1、2 の名前を、それぞれ box、money、mouse に設定し、この 3 項目の有効化の値を 1 にしてください。設定例は下の画像を参照してください。",
+    resourceClassificationClassesImageAlt:
+      "imgclassItemList のクラス ID 0、1、2 をそれぞれ box、money、mouse に設定し、有効化の値をすべて 1 にした画面",
+    resourceClassificationClassesImageCaption: "3 つのクラスの設定：ID 0 は box、ID 1 は money、ID 2 は mouse です。",
+    resourceClassificationWeightLocationTitle: "画像分類の重みファイルを配置する",
+    resourceClassificationWeightLocationBody:
+      "開いた AmebaPro2 フォルダーで、libraries → NeuralNetwork → examples → RTSPImageClassification の順に進んでください。取得した img_class_cnn.nb 重みファイルを、RTSPImageClassification.ino および ClassificationClassList.h と同じ階層に配置してください。",
+    resourceClassificationWeightLocationImageAlt:
+      "AmebaPro2 の libraries、NeuralNetwork、examples、RTSPImageClassification フォルダー内で、img_class_cnn.nb が RTSPImageClassification.ino、ClassificationClassList.h と同じ階層にある画面",
+    resourceClassificationWeightLocationImageCaption:
+      "img_class_cnn.nb を RTSPImageClassification サンプルフォルダー内のコードファイルと同じ階層に配置します。",
     driver: "CH340/CH341 インストーラー",
     hand: "ジェスチャー-カー追跡コード/重み",
     objectBoxTracking: "AMBボックスカー追跡コード/重み",

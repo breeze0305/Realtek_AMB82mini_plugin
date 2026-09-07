@@ -68,7 +68,9 @@ amb82-mini-computer-plugin.exe
 
 「程式碼與權重」頁面將原有資源卡片排成左側單欄，右側顯示目前所選資源的使用說明，進入時預設選取第一項。左右欄依內容自然伸展，共用單一整頁垂直捲動條；卡片增多或說明變長時，兩欄會一起捲動。點擊卡片或使用鍵盤選取，可切換各自的文字與圖片說明；「取得」按鈕仍會開啟原本的檔案另存流程。
 
-01 手勢與 02 AMB 盒子資源皆提供八個段落的正式教學：在 `ObjectDetectionLoop` 選用 `CUSTOMIZED_YOLOV7TINY`，再切換至 `ObjectClassList.h` 設定辨識類別。01 使用 `itemList[5]`，類別 ID 0～4 依序對應 `gesture1`～`gesture5`；02 使用 `itemList[1]`，僅保留類別 ID 0、名稱為 `box` 的項目，各項啟用值均設為 1，並附上各自的類別設定截圖。接著透過主選單的「開啟AmebaPro2資料夾」進入 `libraries → NeuralNetwork → examples → ObjectDetectionLoop`，將取得的 `yolov7_tiny.nb` 放在與 `ObjectDetectionLoop.ino`、`ObjectClassList.h` 相同的資料夾。如需搭配自走車，01 使用 `hand_code.txt`、02 使用 `code.txt` 的全部內容取代 `ObjectDetectionLoop.ino`。兩項教學共用其他操作截圖、自走車接線圖與[組裝影片連結](https://www.youtube.com/watch?v=UpYyOiEFA0k)；每項皆顯示六張隨程式打包的圖片（五張操作截圖與一張接線圖），可離線查看。影片連結會由預設瀏覽器開啟，觀看時需要網路連線。其餘三項仍保留明確標示的佔位說明。「安裝檔」頁面維持原有排列與操作方式。
+01 手勢與 02 AMB 盒子資源皆提供八個段落的正式教學：在 `ObjectDetectionLoop` 選用 `CUSTOMIZED_YOLOV7TINY`，再切換至 `ObjectClassList.h` 設定辨識類別。01 使用 `itemList[5]`，類別 ID 0～4 依序對應 `gesture1`～`gesture5`；02 使用 `itemList[1]`，僅保留類別 ID 0、名稱為 `box` 的項目，各項啟用值均設為 1，並附上各自的類別設定截圖。接著透過主選單的「開啟AmebaPro2資料夾」進入 `libraries → NeuralNetwork → examples → ObjectDetectionLoop`，將取得的 `yolov7_tiny.nb` 放在與 `ObjectDetectionLoop.ino`、`ObjectClassList.h` 相同的資料夾。如需搭配自走車，01 使用 `hand_code.txt`、02 使用 `code.txt` 的全部內容取代 `ObjectDetectionLoop.ino`。兩項教學共用其他操作截圖、自走車接線圖與[組裝影片連結](https://www.youtube.com/watch?v=UpYyOiEFA0k)；每項皆顯示六張隨程式打包的圖片（五張操作截圖與一張接線圖），可離線查看。影片連結會由預設瀏覽器開啟，觀看時需要網路連線。
+
+03 日本、04 台灣與 05 新加坡影像分類資源共用五個操作步驟與五張截圖，使用相同的 `box`、`money`、`mouse` 類別名稱。`box` 均代表 AMB 盒子，`mouse` 均代表滑鼠；`money` 的訓練內容依權重分別為日本硬幣、台灣紙鈔與新加坡紙鈔。請在 Arduino IDE 開啟 `File → AmebaNN → RTSPImageClassification`，將約第 90 行 `imgclass.modelSelect` 的 `DEFAULT_IMGCLASS` 改為 `CUSTOMIZED_IMGCLASS`，再切換至 `ClassificationClassList.h`，將 `imgclassItemList` 中的類別 ID 0、1、2 依序設為 `box`、`money`、`mouse`，啟用值均設為 1。接著透過本工具開啟 AmebaPro2 資料夾，依序進入 `libraries → NeuralNetwork → examples → RTSPImageClassification`，將所選資源的 `img_class_cnn.nb` 放在與 `RTSPImageClassification.ino`、`ClassificationClassList.h` 相同的資料夾。三項教學的操作與截圖完全相同，僅訓練內容說明不同，圖片皆隨程式打包，可離線查看。「安裝檔」頁面維持原有排列與操作方式。
 
 ### Arduino IDE 與 VLC
 

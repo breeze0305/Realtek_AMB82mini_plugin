@@ -30,6 +30,14 @@ const resources = [
   { key: "singapore", nameKey: "singaporeModel", summaryKey: "resourceSingaporeGuideSummary" },
 ] as const;
 
+const classificationImageFiles = [
+  "classification/model-selection.png",
+  "classification/classification-class-list-tab.png",
+  "classification/classification-class-list.png",
+  "gesture/open-amebapro2-folder.png",
+  "classification/weight-folder-location.png",
+];
+
 function createWeightCards(t = translations.en_US) {
   return resources.map(({ key, nameKey }) => ({
     ...createCard(`resource-${key}`, t[nameKey], key),
@@ -38,7 +46,7 @@ function createWeightCards(t = translations.en_US) {
         ? "hand_code.txt / yolov7_tiny.nb"
         : key === "box"
           ? "code.txt / yolov7_tiny.nb"
-          : `${key}_weights.nb`,
+          : "img_class_cnn.nb (box/money/mouse)",
   }));
 }
 
@@ -159,10 +167,26 @@ describe("ResourceLibraryView", () => {
         ).toHaveTextContent(resourceKey === "hand" ? "hand_code.txt" : "code.txt");
         expect(within(guide).queryByText(translations.en_US.resourceGuidePlaceholder)).not.toBeInTheDocument();
       } else {
+        const images = within(guide).getAllByRole("img");
+        expect(images).toHaveLength(classificationImageFiles.length);
+        for (const [imageIndex, image] of images.entries()) {
+          expect(image).toHaveAttribute(
+            "src",
+            expect.stringContaining(`/resource-guides/${classificationImageFiles[imageIndex]}`),
+          );
+          expect(image.getAttribute("alt")?.trim()).toBeTruthy();
+        }
         expect(
-          within(guide).getByRole("img", { name: `Weight placement illustration for ${card.title}` }),
+          within(guide).getByText(
+            "imgclass.modelSelect(IMAGE_CLASSIFICATION, NA_MODEL, NA_MODEL, NA_MODEL, NA_MODEL, DEFAULT_IMGCLASS);",
+          ),
         ).toBeInTheDocument();
-        expect(within(guide).getByText(translations.en_US.resourceGuidePlaceholder)).toBeInTheDocument();
+        expect(
+          within(guide).getByText(
+            "imgclass.modelSelect(IMAGE_CLASSIFICATION, NA_MODEL, NA_MODEL, NA_MODEL, NA_MODEL, CUSTOMIZED_IMGCLASS);",
+          ),
+        ).toBeInTheDocument();
+        expect(within(guide).queryByText(translations.en_US.resourceGuidePlaceholder)).not.toBeInTheDocument();
       }
       for (const other of cards) {
         expect(screen.getByRole("button", { name: `View guide: ${other.title}` })).toHaveAttribute(
@@ -211,6 +235,70 @@ describe("ResourceLibraryView", () => {
         expect(image.getAttribute("alt")?.trim()).toBeTruthy();
         expect(image).not.toHaveAttribute("alt", t.resourceGuidePlaceholder);
       }
+    },
+  );
+
+  it.each(["zh_TW", "en_US", "ja_JP"] as const)(
+    "shares classification setup across regional weights in %s while preserving their distinct summaries",
+    async (language) => {
+      const user = userEvent.setup();
+      const t = translations[language];
+      const cards = createWeightCards(t).slice(2);
+      const moneyDescriptions = {
+        zh_TW: ["日本硬幣", "台灣紙鈔", "新加坡紙鈔"],
+        en_US: ["Japanese coins", "Taiwanese banknotes", "Singaporean banknotes"],
+        ja_JP: ["日本の硬貨", "台湾の紙幣", "シンガポールの紙幣"],
+      }[language];
+      renderResourceLibrary("weights", null, cards, vi.fn(), t);
+      let sharedSteps: string[] | undefined;
+      const summaries = new Set<string>();
+
+      for (const [index, card] of cards.entries()) {
+        await user.click(screen.getByRole("button", { name: `${t.resourceViewGuide}: ${card.title}` }));
+        const guide = screen.getByRole("complementary", { name: card.title });
+        const summary = t[resources[index + 2].summaryKey];
+        expect(within(guide).getByText(summary)).toHaveTextContent(moneyDescriptions[index]);
+        summaries.add(summary);
+
+        expect(within(guide).getByText(t.resourceClassificationCodeGuide)).toHaveTextContent("RTSPImageClassification");
+        expect(within(guide).getByText(t.resourceClassificationClassTabBody)).toHaveTextContent(
+          "ClassificationClassList.h",
+        );
+        const classInstructions = within(guide).getByText(t.resourceClassificationClassesBody);
+        for (const name of ["imgclassItemList", "box", "money", "mouse"]) {
+          expect(classInstructions).toHaveTextContent(name);
+        }
+        const weightInstructions = within(guide).getByText(t.resourceClassificationWeightLocationBody);
+        for (const pathPart of [
+          "libraries",
+          "NeuralNetwork",
+          "examples",
+          "RTSPImageClassification",
+          "img_class_cnn.nb",
+        ]) {
+          expect(weightInstructions).toHaveTextContent(pathPart);
+        }
+        expect(within(guide).queryByText(t.resourceGuidePlaceholder)).not.toBeInTheDocument();
+        expect(within(guide).queryByText(t.resourceImagePlaceholder)).not.toBeInTheDocument();
+        expect(guide).not.toHaveTextContent(/gesture[1-5]|hand_code\.txt|yolov7_tiny\.nb|ObjectDetectionLoop/);
+        expect(within(guide).queryByText(t.resourceHandCarBody)).not.toBeInTheDocument();
+        expect(within(guide).queryByRole("button", { name: t.resourceHandAssemblyLink })).not.toBeInTheDocument();
+
+        const steps = Array.from(guide.querySelectorAll("section"), (section) => section.textContent ?? "");
+        expect(steps).toHaveLength(5);
+        if (sharedSteps) expect(steps).toEqual(sharedSteps);
+        else sharedSteps = steps;
+        for (const [imageIndex, image] of within(guide).getAllByRole("img").entries()) {
+          expect(image).toHaveAttribute(
+            "src",
+            expect.stringContaining(`/resource-guides/${classificationImageFiles[imageIndex]}`),
+          );
+          expect(image.getAttribute("alt")?.trim()).toBeTruthy();
+          expect(image).not.toHaveAttribute("alt", t.resourceGuidePlaceholder);
+        }
+      }
+      expect(summaries.size).toBe(3);
+      for (const card of cards) expect(card.action).not.toHaveBeenCalled();
     },
   );
 
