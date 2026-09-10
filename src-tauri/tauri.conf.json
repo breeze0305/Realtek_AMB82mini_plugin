@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "AMB82 Mini Computer Plugin",
-  "version": "3.18.1",
+  "version": "3.18.2",
   "identifier": "com.breeze0305.amb82plugin",
   "build": {
     "beforeDevCommand": "npm run dev",

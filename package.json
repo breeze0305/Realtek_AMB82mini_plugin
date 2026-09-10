@@ -1,7 +1,7 @@
 {
   "name": "amb82-mini-computer-plugin",
   "private": true,
-  "version": "3.18.1",
+  "version": "3.18.2",
   "type": "module",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
@@ -9,8 +9,9 @@
   "scripts": {
     "sync-version": "node scripts/sync-version.mjs",
     "check:version": "node scripts/sync-version.mjs --check",
+    "check:icon": "node scripts/check-icon.mjs",
     "predev": "npm run sync-version",
-    "prebuild": "npm run sync-version",
+    "prebuild": "npm run sync-version && npm run check:icon",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc && vite build",
     "lint": "eslint . --max-warnings 0",
@@ -18,7 +19,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run check:version && npm run lint && npm run format:check && npm run test && npm run build",
+    "check": "npm run check:version && npm run check:icon && npm run lint && npm run format:check && npm run test && npm run build",
     "preview": "vite preview",
     "tauri": "tauri"
   },

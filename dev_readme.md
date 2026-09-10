@@ -2,7 +2,7 @@
 
 這份文件是未來理解與修改本專案的主要入口。讀完後應該能知道：這個程式有哪些功能、前後端怎麼分工、常見功能要改哪裡、版本號如何由 `version.txt` 統一管理，以及 commit / push 的工作習慣。
 
-目前軟體版本：`3.18.1`
+目前軟體版本：`3.18.2`
 
 > 注意：`dev_readme.md` 目前會納入 git 追蹤。若交接內容或維護流程有變更，應和相關程式碼一起 commit。
 
@@ -20,7 +20,7 @@
 - UI icon：`lucide-react`
 - Windows bundle：Tauri NSIS
 
-## Current frontend architecture (3.18.1)
+## Current frontend architecture (3.18.2)
 
 This section is the authoritative source map for the current frontend. Some older notes below may still mention the pre-refactor shape where most UI lived in `src/App.tsx`; when in doubt, follow this section.
 
@@ -132,6 +132,11 @@ Image conversion behavior:
 - `src-tauri/tauri.conf.json`
   - 視窗大小、bundle 設定、產品名稱、Tauri app version。
   - 主視窗預設為 `1180 × 760`，最小為 `1120 × 640`；最小寬度會保持首頁卡片雙欄排列，並容納標註工作區的正常三欄版面。
+
+- `src-tauri/icons/icon.png` / `icon.ico`
+  - PNG 保留原始 AMB 圖案；Windows ICO 由 Tauri CLI 產生，包含 16、24、32、48、64、256 像素版本，供工作列、標題列及不同顯示縮放使用。
+  - v3.18.2 修正舊 ICO 宣告 144×144、實際圖框卻為 400×400 的尺寸矛盾。更新圖示時，先執行 `npm.cmd run tauri -- icon src-tauri/icons/icon.png --output src-tauri/target/icon-rebuild/generated`，再將產出的 `icon.ico` 複製至 `src-tauri/icons/icon.ico`，保留原始 PNG。
+  - `npm run check:icon` 檢查 ICO 目錄與實際 PNG / DIB 圖框尺寸、資料範圍及必要尺寸；`npm run check` 與 `prebuild` 都會執行，避免格式錯誤的圖示進入後續打包。
 
 - `src-tauri/endpoint_manifest.json`
   - 外部端點集中設定。
@@ -523,7 +528,7 @@ UI 原則：
 
 ## 版本號更新清單
 
-目前版本是 `3.18.1`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
+目前版本是 `3.18.2`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
 
 `npm run sync-version` 會把 `version.txt` 同步到：
 

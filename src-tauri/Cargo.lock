@@ -34,7 +34,7 @@ dependencies = [
 
 [[package]]
 name = "amb82-mini-computer-plugin"
-version = "3.18.1"
+version = "3.18.2"
 dependencies = [
  "hpvcd",
  "image",

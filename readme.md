@@ -242,7 +242,7 @@ https://modelconverter.ntnu-aiot.com/
 
 ## 版本
 
-目前版本：`3.18.1`
+目前版本：`3.18.2`
 
 版本檢查來源：
 
@@ -266,7 +266,7 @@ npm.cmd install
 npm.cmd run build
 ```
 
-版本一致性檢查、前端 lint、格式檢查、測試與 production build：
+版本一致性與 Windows 圖示檢查、前端 lint、格式檢查、測試與 production build：
 
 ```powershell
 npm.cmd run check
