@@ -2,7 +2,7 @@
 
 這份文件是未來理解與修改本專案的主要入口。讀完後應該能知道：這個程式有哪些功能、前後端怎麼分工、常見功能要改哪裡、版本號如何由 `version.txt` 統一管理，以及 commit / push 的工作習慣。
 
-目前軟體版本：`3.17.2`
+目前軟體版本：`3.18.1`
 
 > 注意：`dev_readme.md` 目前會納入 git 追蹤。若交接內容或維護流程有變更，應和相關程式碼一起 commit。
 
@@ -20,7 +20,7 @@
 - UI icon：`lucide-react`
 - Windows bundle：Tauri NSIS
 
-## Current frontend architecture (3.17.2)
+## Current frontend architecture (3.18.1)
 
 This section is the authoritative source map for the current frontend. Some older notes below may still mention the pre-refactor shape where most UI lived in `src/App.tsx`; when in doubt, follow this section.
 
@@ -222,6 +222,11 @@ Image conversion behavior:
 - VLC 使用 manifest 內固定版本的可信 SHA-256；手動下載與自動安裝共用同一份快取。自動安裝從已驗證的快取執行 `/S` 靜默安裝。
 - SHA-256 驗證用來偵測下載或快取 payload 損壞、遭修改；Arduino 離線時的動態版本信任值保存在同一個使用者可寫的 metadata sidecar，因此無法防範同一使用者程序同時替換 payload 與 sidecar，也不代表能防範程式本身或信任資料遭修改。
 - 下載進度由 Rust emit `download-progress` event，前端顯示卡片覆蓋式進度。
+- 自動安裝指令在 `spawn_blocking` worker 內下載、驗證並執行安裝；`installer_process.rs` 以 `ShellExecuteExW` 取得程序 handle，等待結束並驗證退出碼，期間持有安裝作業鎖。MSI 使用系統目錄的 `msiexec.exe /i "<path>" /passive /norestart`；`0` 成功，`3010` / `1641` 回報需重開機，取消及其他錯誤不會進入 PATH 設定。
+- `installer-progress` event 以 `key: arduino | vlc` 與 `phase: installing | configuring_path` 更新卡片階段。自動安裝回傳 `InstallationResult`，包含 `path`、`reboot_required`、`arduino_cli`、`path_error`；Arduino 安裝成功但 PATH 設定失敗仍保留安裝成功資訊。
+- `arduino_cli.rs` 偵測標準安裝目錄與登錄的自訂 Arduino IDE 目錄，驗證 IDE 與內附 CLI 存在。`get_arduino_cli_status` 回傳 `not_installed`、`not_on_path`、`on_path`，`add_arduino_cli_to_path` 加入目前使用者 PATH；自動安裝成功後呼叫相同功能。
+- PATH 比對使用持久化的 HKCU / HKLM 環境值，加入時保留既有使用者 Path 的原文與登錄型別，不複製合併的程序 PATH，不使用 `setx`；重複加入為無操作，寫入後廣播 `WM_SETTINGCHANGE`。既有終端機須重開。狀態查詢與 PATH 失敗都會明確顯示，CLI 不存在時不可加入。
+- `useArduinoCliStatus.ts` 在啟動、切入安裝檔頁、視窗取得焦點及作業完成後刷新，安裝檔頁每 5 秒再查詢。安裝或加入 PATH 期間暫停查詢，忽略過期結果，避免舊狀態覆蓋完成狀態。
 - 內嵌資源優先邏輯：若 exe 同目錄附近有外部 `resource/` 覆寫檔，會優先使用外部檔；找不到才用 binary 內嵌 bytes。
 
 ### AMB 相機畫面擷取
@@ -518,7 +523,7 @@ UI 原則：
 
 ## 版本號更新清單
 
-目前版本是 `3.17.2`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
+目前版本是 `3.18.1`。未來更新版本時，只手動修改 repo 根目錄的 `version.txt`。
 
 `npm run sync-version` 會把 `version.txt` 同步到：
 

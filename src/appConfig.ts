@@ -1,6 +1,7 @@
 import type { ConverterModel, ModelType, UvcdFormat } from "./types";
 
 export const TOAST_DISPLAY_MS = 1500;
+export const INSTALLER_TOAST_DISPLAY_MS = 10000;
 export const TOAST_FADE_MS = 240;
 export const RELEASES_URL = "https://github.com/breeze0305/Realtek_AMB82mini_plugin/releases";
 export const AUTO_UPDATE_CHECK_STORAGE_KEY = "amb82-mini-auto-update-check";

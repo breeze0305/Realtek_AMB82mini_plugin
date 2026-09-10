@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   AUTO_UPDATE_CHECK_STORAGE_KEY,
   converterModelDefaults,
+  INSTALLER_TOAST_DISPLAY_MS,
   RELEASES_URL,
   TOAST_DISPLAY_MS,
   TOAST_FADE_MS,
@@ -34,6 +35,7 @@ import { NetworkStatus } from "./components/NetworkStatus";
 import { ResourceLibraryView } from "./components/ResourceLibraryView";
 import { SettingsView } from "./components/SettingsView";
 import { createHomeCardGroups } from "./homeCards";
+import { useArduinoCliStatus } from "./useArduinoCliStatus";
 import type {
   ActionResult,
   AppSettings,
@@ -46,6 +48,7 @@ import type {
   DownloadKey,
   DownloadProgress,
   DownloadResult,
+  InstallerProgress,
   Language,
   ModelType,
   PreferenceVersion,
@@ -120,8 +123,13 @@ function App() {
   const [running, setRunning] = useState<RunningAction>(null);
   const [isNativeDialogOpen, setIsNativeDialogOpen] = useState(false);
   const [status, setStatus] = useState("");
+  const [installerFeedback, setInstallerFeedback] = useState("");
   const [isFeedbackLeaving, setIsFeedbackLeaving] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<Partial<Record<DownloadKey, number>>>({});
+  const [installerProgress, setInstallerProgress] = useState<
+    Partial<Record<"arduino" | "vlc", InstallerProgress["phase"]>>
+  >({});
+  const arduinoCli = useArduinoCliStatus(view === "installers", running === "arduino" || running === "arduinoCliPath");
   const [internetConnected, setInternetConnected] = useState(false);
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [selectedCamera, setSelectedCamera] = useState("");
@@ -169,6 +177,7 @@ function App() {
     const timer = window.setInterval(() => void refreshInternet(), 30000);
     let disposed = false;
     let unlistenDownloadProgress: (() => void) | undefined;
+    let unlistenInstallerProgress: (() => void) | undefined;
     let unlistenNativeDialogState: (() => void) | undefined;
 
     void listen<DownloadProgress>("download-progress", (event) => {
@@ -180,6 +189,17 @@ function App() {
         nextUnlisten();
       } else {
         unlistenDownloadProgress = nextUnlisten;
+      }
+    });
+
+    void listen<InstallerProgress>("installer-progress", (event) => {
+      const { key, phase } = event.payload;
+      setInstallerProgress((current) => ({ ...current, [key]: phase }));
+    }).then((nextUnlisten) => {
+      if (disposed) {
+        nextUnlisten();
+      } else {
+        unlistenInstallerProgress = nextUnlisten;
       }
     });
 
@@ -197,6 +217,7 @@ function App() {
     return () => {
       disposed = true;
       unlistenDownloadProgress?.();
+      unlistenInstallerProgress?.();
       unlistenNativeDialogState?.();
       window.clearInterval(timer);
       cancelModelConversionRequest({ resetUi: false });
@@ -209,14 +230,19 @@ function App() {
   useEffect(() => {
     if (!status) return;
     setIsFeedbackLeaving(false);
-    const displayMs = status === PREFERENCE_COPY_MESSAGE ? TOAST_DISPLAY_MS * 2 : TOAST_DISPLAY_MS;
+    const displayMs =
+      status === installerFeedback
+        ? INSTALLER_TOAST_DISPLAY_MS
+        : status === PREFERENCE_COPY_MESSAGE
+          ? TOAST_DISPLAY_MS * 2
+          : TOAST_DISPLAY_MS;
     const leaveTimer = window.setTimeout(() => setIsFeedbackLeaving(true), displayMs);
     const clearTimer = window.setTimeout(() => setStatus(""), displayMs + TOAST_FADE_MS);
     return () => {
       window.clearTimeout(leaveTimer);
       window.clearTimeout(clearTimer);
     };
-  }, [status]);
+  }, [status, installerFeedback]);
 
   useEffect(() => {
     if (view === "camera") {
@@ -349,6 +375,14 @@ function App() {
   }
 
   async function runAction<T>(key: Exclude<RunningAction, null>, command: string, next: (result: T) => string) {
+    const isInstallerAction =
+      command === "download_and_install_arduino_ide" ||
+      command === "download_and_install_vlc" ||
+      command === "add_arduino_cli_to_path";
+    function showResult(message: string) {
+      setInstallerFeedback(isInstallerAction ? message : "");
+      setStatus(message);
+    }
     try {
       setOpenActionMenu(null);
       setRunning(key);
@@ -356,14 +390,21 @@ function App() {
         setDownloadProgress((current) => ({ ...current, [key]: 0.02 }));
       }
       const result = await invoke<T>(command);
-      setStatus(next(result));
+      showResult(next(result));
       if (command === "check_version") {
         await refreshInternet();
       }
     } catch (error) {
-      setStatus(String(error));
+      showResult(String(error));
     } finally {
       setRunning(null);
+      if (key === "arduino" || key === "vlc") {
+        setInstallerProgress((current) => {
+          const nextProgress = { ...current };
+          delete nextProgress[key];
+          return nextProgress;
+        });
+      }
       if (isDownloadKey(key)) {
         window.setTimeout(() => {
           setDownloadProgress((current) => {
@@ -912,6 +953,10 @@ function App() {
   }
 
   const { installerCards, mainCards, resourceEntryCards, weightCards } = createHomeCardGroups({
+    arduinoCliStatus: arduinoCli.status,
+    arduinoCliStatusError: arduinoCli.error,
+    onArduinoCliStatusChanged: arduinoCli.updateStatus,
+    installerProgress,
     dashboard,
     internetConnected,
     language,

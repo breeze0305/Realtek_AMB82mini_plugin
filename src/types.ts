@@ -53,6 +53,23 @@ export type DownloadProgress = {
   total?: number | null;
 };
 
+export type ArduinoCliStatus = {
+  status: "not_installed" | "not_on_path" | "on_path";
+  cli_path: string | null;
+};
+
+export type InstallationResult = {
+  path: string;
+  reboot_required: boolean;
+  arduino_cli: ArduinoCliStatus | null;
+  path_error: string | null;
+};
+
+export type InstallerProgress = {
+  key: "arduino" | "vlc";
+  phase: "installing" | "configuring_path";
+};
+
 export type VersionCheck = {
   local: string;
   remote: string;
@@ -201,6 +218,7 @@ export type RunningAction =
   | "taiwan"
   | "singapore"
   | "arduino"
+  | "arduinoCliPath"
   | "vlc"
   | "folder"
   | "settings"

@@ -1,6 +1,6 @@
 [package]
 name = "amb82-mini-computer-plugin"
-version = "3.17.2"
+version = "3.18.1"
 description = "Realtek AMB82-mini Windows desktop assistant"
 authors = ["breeze0305"]
 edition = "2021"
@@ -32,4 +32,4 @@ thiserror = "1"
 ureq = { version = "=2.10.1", default-features = true }
 webview2-com = "=0.33.0"
 windows = "=0.58.0"
-windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Com", "Win32_System_Environment", "Win32_System_Registry", "Win32_System_SystemInformation", "Win32_System_Threading", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging"] }

@@ -8,8 +8,10 @@ export type ActionMenuKey = string;
 export type HomeCard = {
   action: () => void;
   actionIcon: LucideIcon;
+  appearance?: "muted" | "complete";
   detail: string;
   disabled: boolean;
+  disabledReason?: string;
   id: string;
   icon: LucideIcon;
   key: Exclude<RunningAction, null> | null;
@@ -20,6 +22,7 @@ export type HomeCard = {
   }>;
   title: string;
   wholeCardAction?: boolean;
+  wrapDetail?: boolean;
 };
 
 export type CardGridProps = {
@@ -81,7 +84,9 @@ export function CardGrid({
               <span className="cardText wholeCardText">
                 <span className="wholeCardTitle">{card.title}</span>
                 {(card.disabled || card.detail) && (
-                  <span className="wholeCardDetail">{card.disabled ? t.unavailableOffline : card.detail}</span>
+                  <span className="wholeCardDetail">
+                    {card.disabled ? (card.disabledReason ?? t.unavailableOffline) : card.detail}
+                  </span>
                 )}
               </span>
               <ChevronRight className="wholeCardChevron" size={20} aria-hidden="true" />
@@ -93,7 +98,9 @@ export function CardGrid({
           <article
             className={`menuCard ${progress === undefined ? "" : "isDownloading"} ${
               hasOpenActionMenu ? "hasOpenActionMenu" : ""
-            } ${selection ? "isSelectable" : ""} ${selection?.cardId === card.id ? "isSelected" : ""}`}
+            } ${selection ? "isSelectable" : ""} ${selection?.cardId === card.id ? "isSelected" : ""} ${
+              card.appearance === "muted" ? "isMuted" : card.appearance === "complete" ? "isComplete" : ""
+            } ${card.wrapDetail ? "hasWrappedDetail" : ""}`}
             key={card.id}
             style={progressStyle}
           >
@@ -113,7 +120,9 @@ export function CardGrid({
             </div>
             <div className="cardText">
               <h3>{card.title}</h3>
-              {(card.disabled || card.detail) && <p>{card.disabled ? t.unavailableOffline : card.detail}</p>}
+              {(card.disabled || card.detail) && (
+                <p>{card.disabled ? (card.disabledReason ?? t.unavailableOffline) : card.detail}</p>
+              )}
             </div>
             {card.menuActions ? (
               <div

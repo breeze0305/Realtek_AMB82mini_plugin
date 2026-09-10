@@ -18,6 +18,7 @@ Realtek AMB82-mini Computer Plugin 是一款 Windows 桌面工具，用來協助
 - 取得手勢辨識、物件偵測、影像分類等範例程式碼與模型權重。
 - 下載 Arduino IDE 與 VLC 安裝檔。
 - 可選擇自動安裝 Arduino IDE / VLC。
+- 安裝 Arduino IDE 後，可將內附的 Arduino CLI 加入目前使用者的 PATH；自動安裝會在完成後一併設定。
 - 開啟本機 Realtek AmebaPro2 Arduino 套件資料夾。
 - 複製 AMB Preference package URL。
 - 切換 AMB Preference release / beta 版本來源。
@@ -84,6 +85,16 @@ Arduino IDE 或 VLC 第一次下載完成後，安裝檔會保留在應用程式
 Arduino IDE 會透過官方 release metadata 解析最新版安裝檔及其 SHA-256；VLC 使用專案設定的固定版本與可信 SHA-256。CH340/CH341 驅動仍隨程式內嵌，不需網路下載。
 
 下載來源、VLC 固定雜湊與 Arduino fallback 資訊定義在 `src-tauri/endpoint_manifest.json`。
+
+自動安裝會等到安裝程式結束並確認成功後才顯示完成；安裝期間卡片會顯示「安裝中」，取消或失敗會顯示錯誤。若安裝程式要求重新啟動電腦，完成訊息也會提醒。
+
+「安裝檔」頁另有「將 Arduino CLI 加入 PATH」卡片：
+
+- 尚未安裝 Arduino IDE 或找不到內附 CLI：卡片為灰色，無法按下。
+- 已安裝但尚未加入 PATH：可按下「加入 PATH」，離線也能操作。
+- 已加入 PATH：顯示完成狀態，無需重複設定。
+
+透過本工具自動安裝 Arduino IDE，安裝成功後會自動將 CLI 資料夾加入目前使用者的 PATH，並保留原有內容。手動安裝後可回到此頁，狀態會自動更新。若安裝成功但 PATH 設定失敗，畫面會說明原因，可透過獨立卡片重試。設定完成後，請關閉並重新開啟終端機，再執行 `arduino-cli version`；已開啟的終端機不會自動取得新 PATH。
 
 ### AMB Preference 與 UVC 格式
 
@@ -231,7 +242,7 @@ https://modelconverter.ntnu-aiot.com/
 
 ## 版本
 
-目前版本：`3.17.2`
+目前版本：`3.18.1`
 
 版本檢查來源：
 

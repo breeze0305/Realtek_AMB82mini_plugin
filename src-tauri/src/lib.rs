@@ -1,10 +1,13 @@
 mod annotation_orientation;
+mod arduino_cli;
 mod image_conversion;
 mod image_safety;
+mod installer_process;
 
 use annotation_orientation::{
     normalize_annotation_orientations, AnnotationOrientationProgress, AnnotationOrientationSummary,
 };
+use arduino_cli::ArduinoCliStatus;
 use image_conversion::{
     convert_images_in_folder, ImageConversionProgress as CoreImageConversionProgress,
     ImageConversionSummary as CoreImageConversionSummary,
@@ -146,6 +149,20 @@ struct DownloadProgress {
     key: &'static str,
     downloaded: u64,
     total: Option<u64>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct InstallationResult {
+    path: String,
+    reboot_required: bool,
+    arduino_cli: Option<ArduinoCliStatus>,
+    path_error: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+struct InstallerProgress {
+    key: &'static str,
+    phase: &'static str,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -390,7 +407,6 @@ impl InstallerCachePaths {
 struct CachedInstaller {
     path: PathBuf,
     metadata: InstallerMetadata,
-    bytes: u64,
 }
 
 enum ArduinoInstallerResolution {
@@ -572,6 +588,8 @@ pub fn run() {
             save_image_model_singapore_as,
             download_arduino_ide_as,
             download_and_install_arduino_ide,
+            get_arduino_cli_status,
+            add_arduino_cli_to_path,
             download_vlc_as,
             download_and_install_vlc,
             read_model_converter_file,
@@ -1024,19 +1042,60 @@ fn download_arduino_ide_as(
 }
 
 #[tauri::command]
-fn download_and_install_arduino_ide(
-    app: AppHandle,
-    state: tauri::State<AppState>,
-) -> Result<DownloadResult, AppError> {
-    let key = InstallerCacheKey::ArduinoIdeMsi;
-    let _installer_guard = lock_installer_operation(&state, key);
-    let manifest = endpoint_manifest()?;
-    let fallback = installer_metadata(&manifest.downloads.arduino_ide_msi, key)?;
-    let resolution = resolve_arduino_installer(&app, key, &fallback);
-    let cached = obtain_arduino_installer(&app, key, resolution, &fallback)?;
-    install_msi(&cached.path)?;
-    emit_download_progress(&app, key.progress_key(), cached.bytes, Some(cached.bytes));
-    Ok(cached_installer_result(&cached))
+async fn download_and_install_arduino_ide(app: AppHandle) -> Result<InstallationResult, AppError> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let state = app.state::<AppState>();
+        let key = InstallerCacheKey::ArduinoIdeMsi;
+        let _installer_guard = lock_installer_operation(&state, key);
+        let manifest = endpoint_manifest()?;
+        let fallback = installer_metadata(&manifest.downloads.arduino_ide_msi, key)?;
+        let resolution = resolve_arduino_installer(&app, key, &fallback);
+        let cached = obtain_arduino_installer(&app, key, resolution, &fallback)?;
+        emit_installer_progress(&app, key, "installing");
+        let outcome = installer_process::install_msi(&cached.path).map_err(AppError::Message)?;
+        emit_installer_progress(&app, key, "configuring_path");
+        let (arduino_cli, path_error) = match arduino_cli::add_to_user_path() {
+            Ok(status) => (Some(status), None),
+            Err(error) => (arduino_cli::get_status().ok(), Some(error)),
+        };
+        Ok(InstallationResult {
+            path: display_path(&cached.path),
+            reboot_required: outcome.reboot_required,
+            arduino_cli,
+            path_error,
+        })
+    })
+    .await
+    .map_err(|error| AppError::Message(format!("Arduino installation task failed: {error}")))?
+}
+
+#[tauri::command]
+async fn get_arduino_cli_status() -> Result<ArduinoCliStatus, AppError> {
+    tauri::async_runtime::spawn_blocking(arduino_cli::get_status)
+        .await
+        .map_err(|error| AppError::Message(format!("Arduino CLI status task failed: {error}")))?
+        .map_err(AppError::Message)
+}
+
+#[tauri::command]
+async fn add_arduino_cli_to_path(app: AppHandle) -> Result<ArduinoCliStatus, AppError> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let state = app.state::<AppState>();
+        let _installer_guard = lock_installer_operation(&state, InstallerCacheKey::ArduinoIdeMsi);
+        arduino_cli::add_to_user_path().map_err(AppError::Message)
+    })
+    .await
+    .map_err(|error| AppError::Message(format!("Arduino CLI PATH task failed: {error}")))?
+}
+
+fn emit_installer_progress(app: &AppHandle, key: InstallerCacheKey, phase: &'static str) {
+    let _ = app.emit(
+        "installer-progress",
+        InstallerProgress {
+            key: key.progress_key(),
+            phase,
+        },
+    );
 }
 
 #[tauri::command]
@@ -1056,18 +1115,26 @@ fn download_vlc_as(
 }
 
 #[tauri::command]
-fn download_and_install_vlc(
-    app: AppHandle,
-    state: tauri::State<AppState>,
-) -> Result<DownloadResult, AppError> {
-    let key = InstallerCacheKey::VlcExe;
-    let _installer_guard = lock_installer_operation(&state, key);
-    let manifest = endpoint_manifest()?;
-    let metadata = installer_metadata(&manifest.downloads.vlc, key)?;
-    let cached = ensure_cached_installer(&app, key, &metadata)?;
-    install_exe_silent(&cached.path)?;
-    emit_download_progress(&app, key.progress_key(), cached.bytes, Some(cached.bytes));
-    Ok(cached_installer_result(&cached))
+async fn download_and_install_vlc(app: AppHandle) -> Result<InstallationResult, AppError> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let state = app.state::<AppState>();
+        let key = InstallerCacheKey::VlcExe;
+        let _installer_guard = lock_installer_operation(&state, key);
+        let manifest = endpoint_manifest()?;
+        let metadata = installer_metadata(&manifest.downloads.vlc, key)?;
+        let cached = ensure_cached_installer(&app, key, &metadata)?;
+        emit_installer_progress(&app, key, "installing");
+        let outcome =
+            installer_process::install_exe_silent(&cached.path).map_err(AppError::Message)?;
+        Ok(InstallationResult {
+            path: display_path(&cached.path),
+            reboot_required: outcome.reboot_required,
+            arduino_cli: None,
+            path_error: None,
+        })
+    })
+    .await
+    .map_err(|error| AppError::Message(format!("VLC installation task failed: {error}")))?
 }
 
 #[tauri::command]
@@ -2180,13 +2247,12 @@ fn verified_cached_installer(
     validate_installer_metadata(key, metadata)?;
     let paths = installer_cache_paths(app, key)?;
     let payload = paths.payload(key, &metadata.sha256);
-    let Some(bytes) = verified_file_size(&payload, metadata)? else {
+    let Some(_) = verified_file_size(&payload, metadata)? else {
         return Ok(None);
     };
     Ok(Some(CachedInstaller {
         path: payload,
         metadata: metadata.clone(),
-        bytes,
     }))
 }
 
@@ -2232,13 +2298,11 @@ fn ensure_cached_installer(
     }
 
     let payload = paths.payload(key, &metadata.sha256);
-    let result =
-        download_verified_to_path_with_fallback(app, key.progress_key(), metadata, &payload)?;
+    download_verified_to_path_with_fallback(app, key.progress_key(), metadata, &payload)?;
     commit_installer_cache_pointer(&paths, key, previous_metadata.as_ref(), metadata, true)?;
     Ok(CachedInstaller {
         path: payload,
         metadata: metadata.clone(),
-        bytes: result.bytes,
     })
 }
 
@@ -2306,14 +2370,6 @@ fn copy_verified_file_atomically(
         Some(metadata),
         |_| {},
     )
-}
-
-fn cached_installer_result(cached: &CachedInstaller) -> DownloadResult {
-    DownloadResult {
-        file_name: cached.metadata.file_name.clone(),
-        path: display_path(&cached.path),
-        bytes: cached.bytes,
-    }
 }
 
 fn download_result(target: &Path, bytes: u64) -> DownloadResult {
@@ -3216,71 +3272,6 @@ fn open_in_browser(url: &str) -> Result<(), AppError> {
     #[cfg(all(unix, not(target_os = "macos")))]
     {
         Command::new("xdg-open").arg(url).spawn()?;
-    }
-
-    Ok(())
-}
-
-fn install_msi(path: &Path) -> Result<(), AppError> {
-    #[cfg(target_os = "windows")]
-    {
-        let parameters = format!("/i \"{}\" /passive", display_path(path));
-        launch_elevated("msiexec.exe", &parameters)
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    {
-        let _ = path;
-        Err(AppError::Message(
-            "MSI installation is only supported on Windows".into(),
-        ))
-    }
-}
-
-fn install_exe_silent(path: &Path) -> Result<(), AppError> {
-    #[cfg(target_os = "windows")]
-    {
-        launch_elevated(path, "/S")
-    }
-
-    #[cfg(not(target_os = "windows"))]
-    {
-        let _ = path;
-        Err(AppError::Message(
-            "EXE installation is only supported on Windows".into(),
-        ))
-    }
-}
-
-#[cfg(target_os = "windows")]
-fn launch_elevated(file: impl AsRef<std::ffi::OsStr>, parameters: &str) -> Result<(), AppError> {
-    use std::os::windows::ffi::OsStrExt;
-    use std::ptr::{null, null_mut};
-    use windows_sys::Win32::UI::Shell::ShellExecuteW;
-    use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
-
-    fn wide(value: impl AsRef<std::ffi::OsStr>) -> Vec<u16> {
-        value.as_ref().encode_wide().chain(Some(0)).collect()
-    }
-
-    let operation = wide("runas");
-    let file = wide(file);
-    let parameters = wide(parameters);
-    let result = unsafe {
-        ShellExecuteW(
-            null_mut(),
-            operation.as_ptr(),
-            file.as_ptr(),
-            parameters.as_ptr(),
-            null(),
-            SW_SHOWNORMAL,
-        )
-    } as isize;
-
-    if result <= 32 {
-        return Err(AppError::Message(format!(
-            "Failed to launch installer with administrator permission (ShellExecuteW code {result})"
-        )));
     }
 
     Ok(())

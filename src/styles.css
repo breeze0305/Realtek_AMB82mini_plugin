@@ -464,6 +464,53 @@ button:disabled {
   white-space: nowrap;
 }
 
+.menuCard.hasWrappedDetail {
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+}
+
+.menuCard.hasWrappedDetail .cardText p {
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.menuCard.isMuted {
+  border-color: #d7d5cf;
+  background: #f0efec;
+}
+
+.menuCard.isMuted .cardIcon {
+  color: #656d68;
+  background: #dedfdb;
+}
+
+.menuCard.isMuted .cardText h3,
+.menuCard.isMuted .cardText p,
+.menuCard.isMuted .cardIndex {
+  color: #656d68;
+}
+
+.menuCard.isMuted .primaryBtn {
+  background: #737a76;
+}
+
+.menuCard.isComplete {
+  border-color: #b8d6c5;
+  background: #f1f8f3;
+}
+
+.menuCard.isComplete .cardIcon {
+  color: #23734d;
+  background: #d7ecdf;
+}
+
+.menuCard.isComplete .primaryBtn:disabled {
+  color: #23734d;
+  background: #d7ecdf;
+  opacity: 1;
+}
+
 .resourceWeightsSection {
   width: min(1380px, 100%);
   max-width: 1380px;
